@@ -3,7 +3,7 @@ class Semaforo:
         self.duracao_verde = duracao_verde
         self.duracao_amarelo = duracao_amarelo
         self.duracao_vermelho = duracao_vermelho
-        self.estado_atual = 'vermelho'
+        self.estado_atual = 'verde'
         self.tempo_restante = duracao_vermelho
 
     def ciclo_semaforo(self):

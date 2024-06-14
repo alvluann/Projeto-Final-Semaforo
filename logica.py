@@ -34,42 +34,44 @@ def criar_trafego_personalizado(quant_carros_pequenos, quant_carros_medios, quan
     random.shuffle(lista_fila)
     return deque(lista_fila)
 
+def calculaTempoTransito(tempo_sobra, fila_veiculos, distancia_semaforo, semaforo, duracao_verde, duracao_amarelo, duracao_vermelho):
+    while tempo_sobra > 0 and len(fila_veiculos) > 0:
+        veiculo = fila_veiculos[0]
+        caracteristicas = veiculo.caracteristica()
+        tamanho = caracteristicas["tamanho"]
+        velocidade = caracteristicas["velocidade"]
+
+        if len(fila_veiculos) > 1:
+            proximo_veiculo = fila_veiculos[1]
+            proximo_tamanho = proximo_veiculo.caracteristica()["tamanho"]
+            distancia_a_percorrer = distancia_semaforo + proximo_tamanho
+        else:
+            distancia_a_percorrer = distancia_semaforo
+
+        tempo = distancia_a_percorrer / velocidade
+        tempo_sobra -= tempo
+
+        if tempo_sobra >= 0:
+            fila_veiculos.popleft()
+
+    return tempo_sobra
+
+
 def simular_transito(fila_veiculos, duracao_verde, duracao_amarelo, duracao_vermelho, distancia_semaforo):
     semaforo = Semaforo(duracao_verde, duracao_amarelo, duracao_vermelho)
     ciclos_completos = 0
 
-    primeiro_veiculo = None
-    segundo_veiculo = None
-
-    while len(fila_veiculos) != 0:
-        semaforo.ciclo_semaforo()
-
-        if semaforo.is_verde() and semaforo.duracao_verde >= 0:
-            while fila_veiculos and semaforo.duracao_verde > 0:
-                veiculo = fila_veiculos.popleft()
-
-                if not primeiro_veiculo:
-                    primeiro_veiculo = veiculo
-                    distancia_percorrida = veiculo.tamanho() * semaforo.duracao_verde / veiculo.caracteristica()["velocidade"]
-                    if distancia_percorrida >= distancia_semaforo:
-                        # First vehicle crosses the intersection
-                        primeiro_veiculo = None
-                elif primeiro_veiculo and segundo_veiculo is None:
-                    segundo_veiculo = veiculo
-                    distancia_percorrida = veiculo.tamanho() * semaforo.duracao_verde / veiculo.caracteristica()["velocidade"]
-                elif segundo_veiculo:
-                    if veiculo.caracteristica()["velocidade"] > primeiro_veiculo.caracteristica()["velocidade"]:
-                        veiculo.caracteristica()["velocidade"] = primeiro_veiculo.caracteristica()["velocidade"]
-                    distancia_percorrida = veiculo.tamanho() * semaforo.duracao_verde / veiculo.caracteristica()["velocidade"]
-
-                    if distancia_percorrida >= distancia_semaforo:
-                        segundo_veiculo = None
-
-                semaforo.duracao_verde -= veiculo.tamanho() / veiculo.caracteristica()["velocidade"]
-
+    while len(fila_veiculos) > 0:
+        tempo_sobra = duracao_verde + duracao_amarelo
+        tempo_sobra = calculaTempoTransito(tempo_sobra, fila_veiculos, distancia_semaforo, semaforo, duracao_verde,
+                                           duracao_amarelo, duracao_vermelho)
         ciclos_completos += 1
 
+        if len(fila_veiculos) > 0:
+            semaforo.ciclo_semaforo()
+
     return ciclos_completos
+
 
 def salvar_relatorio(conexao, quantidade_veiculos, duracao_verde, duracao_amarelo, duracao_vermelho, distancia_semaforo,
                      ciclos_completos, quant_carros_pequenos, quant_carros_medios, quant_carros_grandes,

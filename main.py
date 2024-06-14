@@ -1,7 +1,6 @@
 from logica import criar_trafego, criar_trafego_personalizado, simular_transito, salvar_relatorio, mostrar_relatorios
 from banco import conectar_banco, criar_tabela_relatorios
 from veiculos import Carro, Caminhao
-import mysql.connector
 
 def main():
     print("Escolha como deseja trabalhar o trânsito:")

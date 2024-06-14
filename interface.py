@@ -1,10 +1,9 @@
-
-from veiculos import Carro, Caminhao
 import tkinter as tk
 from tkinter import messagebox, Toplevel, ttk
 from logica import criar_trafego, criar_trafego_personalizado, simular_transito, salvar_relatorio, mostrar_relatorios
 from banco import conectar_banco, criar_tabela_relatorios
 import matplotlib.pyplot as plt
+from veiculos import Carro, Caminhao
 
 class SimuladorApp:
     def __init__(self, root):
@@ -36,35 +35,35 @@ class SimuladorApp:
         btn_graficos.pack(fill=tk.X, pady=5)
         
         # Frame para os inputs
-        inputs_frame = tk.Frame(main_frame, bg="#f0f0f0")
-        inputs_frame.grid(row=0, column=1, sticky='nsew', padx=10, pady=10)
+        self.inputs_frame = tk.Frame(main_frame, bg="#f0f0f0")
+        self.inputs_frame.grid(row=0, column=1, sticky='nsew', padx=10, pady=10)
 
         # Escolha do tipo de trânsito
-        label_tipo = tk.Label(inputs_frame, text="Escolha como deseja trabalhar o trânsito:", font=('Helvetica', 14, 'bold'), bg="#f0f0f0")
+        label_tipo = tk.Label(self.inputs_frame, text="Escolha como deseja trabalhar o trânsito:", font=('Helvetica', 14, 'bold'), bg="#f0f0f0")
         label_tipo.grid(row=0, column=0, columnspan=2, pady=10)
 
         self.tipo_var = tk.IntVar()
-        radio_aleatorio = tk.Radiobutton(inputs_frame, text="Aleatório", variable=self.tipo_var, value=1, font=('Helvetica', 12), bg="#f0f0f0")
+        radio_aleatorio = tk.Radiobutton(self.inputs_frame, text="Aleatório", variable=self.tipo_var, value=1, font=('Helvetica', 12), bg="#f0f0f0", command=self.toggle_inputs)
         radio_aleatorio.grid(row=1, column=0, sticky='w')
-        radio_personalizado = tk.Radiobutton(inputs_frame, text="Personalizado", variable=self.tipo_var, value=2, font=('Helvetica', 12), bg="#f0f0f0")
+        radio_personalizado = tk.Radiobutton(self.inputs_frame, text="Personalizado", variable=self.tipo_var, value=2, font=('Helvetica', 12), bg="#f0f0f0", command=self.toggle_inputs)
         radio_personalizado.grid(row=1, column=1, sticky='w')
-        radio_relatorio = tk.Radiobutton(inputs_frame, text="Mostrar Relatório", variable=self.tipo_var, value=3, font=('Helvetica', 12), bg="#f0f0f0")
+        radio_relatorio = tk.Radiobutton(self.inputs_frame, text="Mostrar Relatório", variable=self.tipo_var, value=3, font=('Helvetica', 12), bg="#f0f0f0", command=self.toggle_inputs)
         radio_relatorio.grid(row=1, column=2, sticky='w')
 
         # Inputs para tráfego aleatório
-        self.label_quantidade_veiculos = tk.Label(inputs_frame, text="Quantidade total de veículos:", font=('Helvetica', 12), bg="#f0f0f0")
+        self.label_quantidade_veiculos = tk.Label(self.inputs_frame, text="Quantidade total de veículos:", font=('Helvetica', 12), bg="#f0f0f0")
         self.label_quantidade_veiculos.grid(row=2, column=0, sticky='e', pady=5, padx=5)
-        self.entry_quantidade_veiculos = tk.Entry(inputs_frame, font=('Helvetica', 12))
+        self.entry_quantidade_veiculos = tk.Entry(self.inputs_frame, font=('Helvetica', 12))
         self.entry_quantidade_veiculos.grid(row=2, column=1, pady=5, padx=5)
 
         # Inputs para tráfego personalizado
-        self.create_personalizado_inputs(inputs_frame)
+        self.create_personalizado_inputs(self.inputs_frame)
 
         # Inputs para o semáforo
-        self.create_semaforo_inputs(inputs_frame)
+        self.create_semaforo_inputs(self.inputs_frame)
 
         # Botão para iniciar a simulação
-        btn_iniciar = tk.Button(inputs_frame, text="Iniciar Simulação", command=self.iniciar_simulacao, font=('Helvetica', 12, 'bold'), bg="#4CAF50", fg="white")
+        btn_iniciar = tk.Button(self.inputs_frame, text="Iniciar Simulação", command=self.iniciar_simulacao, font=('Helvetica', 12, 'bold'), bg="#4CAF50", fg="white")
         btn_iniciar.grid(row=13, column=0, columnspan=2, pady=20)
 
     def create_personalizado_inputs(self, frame):
@@ -118,6 +117,84 @@ class SimuladorApp:
         self.label_distancia_semaforo.grid(row=12, column=0, sticky='e', pady=5, padx=5)
         self.entry_distancia_semaforo = tk.Entry(frame, font=('Helvetica', 12))
         self.entry_distancia_semaforo.grid(row=12, column=1, pady=5, padx=5)
+
+    def toggle_inputs(self):
+        escolha = self.tipo_var.get()
+        if escolha == 1:  # Aleatório
+            self.label_quantidade_veiculos.grid()
+            self.entry_quantidade_veiculos.grid()
+
+            self.label_carros_pequenos.grid_remove()
+            self.entry_carros_pequenos.grid_remove()
+            self.label_carros_medios.grid_remove()
+            self.entry_carros_medios.grid_remove()
+            self.label_carros_grandes.grid_remove()
+            self.entry_carros_grandes.grid_remove()
+            self.label_camioes_pequenos.grid_remove()
+            self.entry_camioes_pequenos.grid_remove()
+            self.label_camioes_medios.grid_remove()
+            self.entry_camioes_medios.grid_remove()
+            self.label_camioes_grandes.grid_remove()
+            self.entry_camioes_grandes.grid_remove()
+
+            self.label_duracao_verde.grid()
+            self.entry_duracao_verde.grid()
+            self.label_duracao_amarelo.grid()
+            self.entry_duracao_amarelo.grid()
+            self.label_duracao_vermelho.grid()
+            self.entry_duracao_vermelho.grid()
+            self.label_distancia_semaforo.grid()
+            self.entry_distancia_semaforo.grid()
+        elif escolha == 2:  # Personalizado
+            self.label_quantidade_veiculos.grid_remove()
+            self.entry_quantidade_veiculos.grid_remove()
+
+            self.label_carros_pequenos.grid()
+            self.entry_carros_pequenos.grid()
+            self.label_carros_medios.grid()
+            self.entry_carros_medios.grid()
+            self.label_carros_grandes.grid()
+            self.entry_carros_grandes.grid()
+            self.label_camioes_pequenos.grid()
+            self.entry_camioes_pequenos.grid()
+            self.label_camioes_medios.grid()
+            self.entry_camioes_medios.grid()
+            self.label_camioes_grandes.grid()
+            self.entry_camioes_grandes.grid()
+
+            self.label_duracao_verde.grid()
+            self.entry_duracao_verde.grid()
+            self.label_duracao_amarelo.grid()
+            self.entry_duracao_amarelo.grid()
+            self.label_duracao_vermelho.grid()
+            self.entry_duracao_vermelho.grid()
+            self.label_distancia_semaforo.grid()
+            self.entry_distancia_semaforo.grid()
+        else:  # Relatório
+            self.label_quantidade_veiculos.grid_remove()
+            self.entry_quantidade_veiculos.grid_remove()
+
+            self.label_carros_pequenos.grid_remove()
+            self.entry_carros_pequenos.grid_remove()
+            self.label_carros_medios.grid_remove()
+            self.entry_carros_medios.grid_remove()
+            self.label_carros_grandes.grid_remove()
+            self.entry_carros_grandes.grid_remove()
+            self.label_camioes_pequenos.grid_remove()
+            self.entry_camioes_pequenos.grid_remove()
+            self.label_camioes_medios.grid_remove()
+            self.entry_camioes_medios.grid_remove()
+            self.label_camioes_grandes.grid_remove()
+            self.entry_camioes_grandes.grid_remove()
+
+            self.label_duracao_verde.grid_remove()
+            self.entry_duracao_verde.grid_remove()
+            self.label_duracao_amarelo.grid_remove()
+            self.entry_duracao_amarelo.grid_remove()
+            self.label_duracao_vermelho.grid_remove()
+            self.entry_duracao_vermelho.grid_remove()
+            self.label_distancia_semaforo.grid_remove()
+            self.entry_distancia_semaforo.grid_remove()
 
     def iniciar_simulacao(self):
         try:
@@ -243,4 +320,3 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = SimuladorApp(root)
     root.mainloop()
-
