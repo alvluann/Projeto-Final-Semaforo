@@ -277,8 +277,6 @@ class SimuladorApp:
         if not relatorios:
             messagebox.showinfo("Informação", "Não há dados para mostrar os gráficos.")
             return
-
-        # Preparar dados para os gráficos
         ids = [relatorio[0] for relatorio in relatorios]
         duracao_verde = [relatorio[1] for relatorio in relatorios]
         duracao_amarelo = [relatorio[2] for relatorio in relatorios]
@@ -286,7 +284,6 @@ class SimuladorApp:
         quantidade_veiculos = [relatorio[4] for relatorio in relatorios]
         ciclos_completos = [relatorio[12] for relatorio in relatorios]
 
-        # Plotar gráficos
         fig, axs = plt.subplots(2, 2, figsize=(12, 8))
 
         axs[0, 0].plot(ids, duracao_verde, label='Duração Verde')
